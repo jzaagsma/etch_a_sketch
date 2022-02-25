@@ -1,16 +1,18 @@
 const theGrid = document.getElementById("grid");
-const clearButton = document.getElementById("buttons");
-// caching the DOM, since there is only the one div in the HTML file, this 
-// only includes the main container that I will then put all the other Divs in.
+const clearButton = document.getElementById("shake");
+const resizeButton = document.getElementById("resize");
+
+// caching the DOM
 
 let divSize = 16; // how many cells in each row
-let totalCells = Math.pow(divSize, 2); // how many total cells in the grid
-let columnNumberArray = Array(divSize).fill('auto'); // creates an array for 
+//let totalCells = Math.pow(divSize, 2); // how many total cells in the grid
+//let columnNumberArray = Array(divSize).fill('auto'); // creates an array for 
 // the gridTemplateColumns input
-let columnNumberString = columnNumberArray.join(" "); // formats the above array
+//let columnNumberString = columnNumberArray.join(" "); // formats the above array
 // to ensure that the input is a string with only spaces in between items
 
-function createCells(totalCells) {
+function createCells(divSize) {
+    let totalCells = Math.pow(divSize, 2); // how many total cells in the grid
     for (i = 0; i < totalCells; i++) {
         let newCell = document.createElement('div');
         newCell.classList.add('cell');
@@ -20,9 +22,34 @@ function createCells(totalCells) {
         newCell.addEventListener('mouseover', function() {
             newCell.classList.add('hover');
         });
+        newCell.addEventListener('animationend', function() {
+            newCell.classList.remove('hover');
+        })
     } 
+    let columnNumberArray = Array(divSize).fill('auto'); // creates an array for 
+    let columnNumberString = columnNumberArray.join(" "); // formats the above array
+    theGrid.style.gridTemplateColumns = `${columnNumberString}`;
 }
 
-createCells(totalCells);
+function clearGrid(){
+    while (theGrid.firstChild) {
+        theGrid.removeChild(theGrid.firstChild)
+    }
+}
 
-theGrid.style.gridTemplateColumns = `${columnNumberString}`;
+clearButton.addEventListener('click', function() {
+    theGrid.classList.add('shake');
+    setTimeout(function() {document.getElementById("grid").classList.remove('shake')}, 200);
+    clearGrid();
+    createCells(divSize);
+})
+
+resizeButton.addEventListener('click', function() {
+    let setSize = prompt("How many number of squares per side would you like?");
+    let divSize = parseInt(setSize);
+    clearGrid();
+    createCells(divSize);
+    return divSize;
+})
+
+createCells(divSize);
